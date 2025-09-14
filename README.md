@@ -127,7 +127,7 @@ Statistics:
 ✅ Basic CLI structure with commands (`run`, `simulate`, `compare`, `init`)  
 ✅ Ruby 3.4.5 version management with mise  
 ✅ Dependencies and fancy CLI components (TTY toolkit, StandardRB)  
-⚠️ TOML configuration system - Basic configuration class created  
+⚠️ TOML configuration system - Sample config file created and tested  
 🔲 Core simulation classes (Building, Elevator, User)  
 🔲 Real-time visualization
 

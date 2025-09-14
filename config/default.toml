@@ -1,0 +1,23 @@
+# Default Elevator Simulation Configuration
+
+[building]
+floors = 10
+basement_floors = 1
+
+[elevators.main]
+count = 2
+capacity = 8
+speed_floors_per_second = 2.0
+door_open_time = 2.5
+door_close_time = 2.0
+service_floors = [1, 10]
+
+[simulation]
+duration_minutes = 10
+user_spawn_rate = 0.3
+random_seed = 42
+
+[users]
+movement_speed = 1.5
+button_press_delay = 0.8
+floor_distribution = "uniform"
