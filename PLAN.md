@@ -49,6 +49,7 @@ basement_floors = 2
 
 [elevators.main]
 count = 4
+capacity = 8
 speed_floors_per_second = 2.5
 door_open_time = 3.0
 door_close_time = 2.0
