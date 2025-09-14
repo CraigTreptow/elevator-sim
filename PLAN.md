@@ -23,7 +23,11 @@ A Ruby CLI application that simulates elevator systems with user-provided algori
 ### 2. Configuration System
 - [x] Create TOML configuration system for simulation parameters
 
-### 3. Simulation Components
+### 3. Queue Management System  
+- [x] Create Queue class for generating reproducible people data
+- [x] Add named queue management and CLI commands (generate-queue, show-queue, list-queues)
+
+### 4. Simulation Components
 - [ ] Implement Building class with configurable floors and elevator setup
 - [ ] Create Elevator class with movement, door timing, and floor range logic
 - [ ] Implement User/Passenger class with spawn rates and movement patterns
@@ -31,7 +35,7 @@ A Ruby CLI application that simulates elevator systems with user-provided algori
 - [ ] Build simulation engine to orchestrate elevators, users, and timing
 - [ ] Implement statistics tracking system for performance metrics
 
-### 4. User Interface & Finalization
+### 5. User Interface & Finalization
 - [ ] Set up TTY toolkit gems for fancy CLI interface
 - [ ] Create real-time visualization showing elevator positions and states
 - [ ] Create CLI argument parsing and command structure with TTY components

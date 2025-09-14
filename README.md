@@ -52,6 +52,18 @@ bundle install  # Install gem dependencies
 ./bin/elevator-sim
 ```
 
+### Queue Management
+```bash
+# Generate a named queue
+./bin/elevator-sim generate-queue --name rush_hour
+
+# Show queue contents  
+./bin/elevator-sim show-queue --name rush_hour
+
+# List all available queues
+./bin/elevator-sim list-queues
+```
+
 ## Configuration
 
 Create TOML configuration files to define your simulation parameters:
@@ -128,7 +140,8 @@ Statistics:
 ✅ Ruby 3.4.5 version management with mise  
 ✅ Dependencies and fancy CLI components (TTY toolkit, StandardRB)  
 ✅ TOML configuration system with accessor methods  
-⚠️ Core simulation classes - Named queue management system complete  
+✅ Queue management system with reproducible people generation  
+⚠️ Core simulation classes (Building, Elevator, User) - Next up  
 🔲 Real-time visualization
 
 ## License

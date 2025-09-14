@@ -19,6 +19,20 @@ bundle exec ruby -c lib/elevator_sim.rb  # Syntax check
 bundle exec ruby -e "require_relative 'lib/elevator_sim'; config = ElevatorSim::Configuration.load('config/default.toml'); puts config.building_floors"  # Test config loading
 ```
 
+### Queue Management Commands
+```bash
+# Generate queues
+./bin/elevator-sim generate-queue --name rush_hour
+./bin/elevator-sim generate-queue --name evening --config config/custom.toml
+
+# View queues
+./bin/elevator-sim show-queue --name rush_hour --limit 5
+./bin/elevator-sim list-queues
+
+# Test queue loading
+bundle exec ruby -e "require_relative 'lib/elevator_sim'; queue = ElevatorSim::Queue.load('queues/default.json'); puts queue.people.first"
+```
+
 ### Linting and Type Checking
 ```bash
 bundle exec standardrb --fix  # Ruby linting with Standard
