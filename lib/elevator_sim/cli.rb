@@ -18,6 +18,7 @@ module ElevatorSim
       puts "  compare         Compare multiple algorithms"
       puts "  generate-queue  Generate a reproducible queue of people"
       puts "  show-queue      Display queue contents"
+      puts "  list-queues     List all available queues"
       puts "  init            Create configuration wizard"
       puts "  version         Show version"
       puts
@@ -34,6 +35,8 @@ module ElevatorSim
         generate_queue_command(args)
       when "show-queue"
         show_queue_command(args)
+      when "list-queues"
+        list_queues_command(args)
       when "version"
         puts "v#{VERSION}"
       else
@@ -44,7 +47,8 @@ module ElevatorSim
 
     def generate_queue_command(args)
       config_file = extract_option(args, "--config") || "config/default.toml"
-      output_file = extract_option(args, "--output") || "queues/default.json"
+      queue_name = extract_option(args, "--name") || "default"
+      output_file = extract_option(args, "--output") || "queues/#{queue_name}.json"
 
       puts "🎯 Generating queue..."
       puts "  Config: #{config_file}"
@@ -70,7 +74,8 @@ module ElevatorSim
     end
 
     def show_queue_command(args)
-      queue_file = extract_option(args, "--queue") || "queues/default.json"
+      queue_name = extract_option(args, "--name") || extract_option(args, "--queue") || "default"
+      queue_file = queue_name.end_with?(".json") ? "queues/#{queue_name}" : "queues/#{queue_name}.json"
       limit = extract_option(args, "--limit")&.to_i || 10
 
       puts "📋 Queue: #{queue_file}"
@@ -101,8 +106,47 @@ module ElevatorSim
       index = args.find_index(option_name)
       return nil unless index && index < args.length - 1
 
-      args.delete_at(index + 1)
+      value = args.delete_at(index + 1)
       args.delete_at(index)
+      value
+    end
+
+    def list_queues_command(args)
+      puts "📋 Available queues:"
+
+      begin
+        queue_dir = "queues"
+
+        unless Dir.exist?(queue_dir)
+          puts "  No queues directory found. Generate a queue first with:"
+          puts "  ./bin/elevator-sim generate-queue --name myqueue"
+          return
+        end
+
+        queue_files = Dir.glob("#{queue_dir}/*.json").sort
+
+        if queue_files.empty?
+          puts "  No queues found. Generate a queue first with:"
+          puts "  ./bin/elevator-sim generate-queue --name myqueue"
+          return
+        end
+
+        queue_files.each do |file_path|
+          queue = Queue.load(file_path)
+          name = File.basename(file_path, ".json")
+          metadata = queue.metadata
+
+          puts "  #{name} (#{queue.people.length} people, #{metadata["duration_minutes"]}min, seed: #{metadata["seed"]})"
+        rescue => e
+          name = File.basename(file_path, ".json")
+          puts "  #{name} (error: #{e.message})"
+        end
+
+        puts
+        puts "Use with: ./bin/elevator-sim show-queue --name <queue_name>"
+      rescue => e
+        puts "❌ Error: #{e.message}"
+      end
     end
   end
 end

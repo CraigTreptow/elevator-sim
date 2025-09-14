@@ -128,7 +128,7 @@ Statistics:
 ✅ Ruby 3.4.5 version management with mise  
 ✅ Dependencies and fancy CLI components (TTY toolkit, StandardRB)  
 ✅ TOML configuration system with accessor methods  
-⚠️ Core simulation classes - Queue generation and CLI commands added  
+⚠️ Core simulation classes - Named queue management system complete  
 🔲 Real-time visualization
 
 ## License
