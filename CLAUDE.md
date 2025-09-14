@@ -16,6 +16,7 @@ Elevator simulation CLI written in Ruby that allows users to test different elev
 ```bash
 bundle install
 bundle exec ruby -c lib/elevator_sim.rb  # Syntax check
+bundle exec ruby -e "require_relative 'lib/elevator_sim'; config = ElevatorSim::Configuration.load('config/default.toml'); puts config.building_floors"  # Test config loading
 ```
 
 ### Linting and Type Checking

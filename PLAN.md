@@ -21,7 +21,7 @@ A Ruby CLI application that simulates elevator systems with user-provided algori
 - [x] Set up Gemfile with fancy CLI dependencies (TTY toolkit, TOML parsing)
 
 ### 2. Configuration System
-- [ ] Create TOML configuration system for simulation parameters
+- [x] Create TOML configuration system for simulation parameters
 
 ### 3. Simulation Components
 - [ ] Implement Building class with configurable floors and elevator setup
