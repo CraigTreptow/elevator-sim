@@ -19,11 +19,9 @@ bundle exec ruby -c lib/elevator_sim.rb  # Syntax check
 ```
 
 ### Linting and Type Checking
-When available, run these commands before committing:
 ```bash
-# Add actual commands once we determine the linting setup
-# rubocop --auto-correct  # Ruby linting
-# steep check             # Type checking (if using Steep)
+bundle exec standardrb --fix  # Ruby linting with Standard
+bundle exec rspec             # Run tests
 ```
 
 ## Project Structure
@@ -37,7 +35,11 @@ When available, run these commands before committing:
 ## Key Dependencies
 
 - **TTY toolkit** - For fancy CLI interface with real-time visualization
+  - `tty-box`, `tty-cursor`, `tty-prompt`, `tty-progressbar`, `tty-screen`, `tty-spinner`, `tty-table`, `tty-command`
+  - `pastel` - Terminal colors
 - **tomlrb** - For TOML configuration parsing
+- **standard** - Ruby linting (zero-configuration style guide)
+- **rspec** - Testing framework
 - **Ruby 3.4.5** - Managed by mise
 
 ## Development Notes
