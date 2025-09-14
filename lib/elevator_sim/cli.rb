@@ -22,6 +22,11 @@ module ElevatorSim
       puts "  init            Create configuration wizard"
       puts "  version         Show version"
       puts
+      puts "Examples:"
+      puts "  elevator-sim generate-queue --name rush_hour"
+      puts "  elevator-sim show-queue --name rush_hour"
+      puts "  elevator-sim list-queues"
+      puts
       puts "Use 'elevator-sim [command] --help' for more information"
     end
 
