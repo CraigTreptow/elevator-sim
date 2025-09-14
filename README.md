@@ -10,12 +10,18 @@ A Ruby CLI application that simulates elevator systems with user-provided algori
 - 🎨 **Real-time visualization** - fancy CLI interface with live elevator positions
 - ⚙️ **TOML configuration** - easily adjust all simulation parameters
 
+## Requirements
+
+- **[mise](https://mise.jdx.dev/)** - For Ruby version management
+- **Ruby 3.4.5** - Will be installed automatically by mise
+
 ## Installation
 
 ```bash
 git clone https://github.com/CraigTreptow/elevator-sim.git
 cd elevator-sim
-bundle install
+mise install    # Install Ruby 3.4.5 using mise
+bundle install  # Install gem dependencies
 ```
 
 ## Usage
@@ -39,6 +45,11 @@ bundle install
 ### Configuration wizard
 ```bash
 ./bin/elevator-sim init
+```
+
+### Check CLI is working
+```bash
+./bin/elevator-sim
 ```
 
 ## Configuration
@@ -110,6 +121,15 @@ Statistics:
 - `═E1═` Stopped (doors closed)
 - `◉E1` Stopped (doors open)
 - `│E1│` Idle/waiting
+
+## Development Status
+
+✅ Basic CLI structure with commands (`run`, `simulate`, `compare`, `init`)  
+✅ Ruby 3.4.5 version management with mise  
+⚠️ Dependencies and fancy CLI components (TTY toolkit) - In Progress  
+🔲 TOML configuration system  
+🔲 Core simulation classes (Building, Elevator, User)  
+🔲 Real-time visualization
 
 ## License
 

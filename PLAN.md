@@ -16,9 +16,9 @@ A Ruby CLI application that simulates elevator systems with user-provided algori
 
 ### 1. Core Infrastructure
 - [x] Initialize git repository and create initial project structure
-- [ ] Set up mise-en-place configuration for Ruby version management
-- [ ] Create basic Ruby CLI application structure with main entry point
-- [ ] Set up Gemfile with necessary dependencies including TOML parsing
+- [x] Set up mise-en-place configuration for Ruby version management
+- [x] Create basic Ruby CLI application structure with main entry point
+- [ ] Set up Gemfile with fancy CLI dependencies (TTY toolkit, TOML parsing)
 
 ### 2. Configuration System
 - [ ] Create TOML configuration system for simulation parameters
