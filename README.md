@@ -94,21 +94,26 @@ floor_distribution = "uniform"  # uniform, weighted, rush_hour
 
 ## Writing Algorithms
 
-Create Ruby classes that implement the elevator dispatch interface:
+Create Ruby classes that inherit from ElevatorSim::Algorithm:
 
 ```ruby
-class MyAlgorithm
-  def initialize(building, elevators)
-    @building = building
-    @elevators = elevators
+class MyAlgorithm < ElevatorSim::Algorithm
+  def initialize(building, config)
+    super
+    # Your initialization here
   end
 
   def dispatch(call_requests, elevator_states)
     # Your algorithm logic here
-    # Return elevator assignments
+    # call_requests: [{floor: 5, direction: :up, user: User}]
+    # elevator_states: [{id: 1, current_floor: 3, state: :idle, passengers: 2}]
+    # Return: [{elevator_id: 1, action: :move_to_floor, target_floor: 5}]
+    []
   end
 end
 ```
+
+See `algorithms/fifo.rb` for a complete example implementing First In, First Out dispatch.
 
 ## Real-time Visualization
 
@@ -141,7 +146,8 @@ Statistics:
 ✅ Dependencies and fancy CLI components (TTY toolkit, StandardRB)  
 ✅ TOML configuration system with accessor methods  
 ✅ Queue management system with reproducible people generation  
-⚠️ Core simulation classes - User class created with state tracking and statistics  
+✅ Core simulation classes - Building, Elevator, User, Algorithm interface  
+✅ Simulation engine with time-based orchestration and statistics  
 🔲 Real-time visualization
 
 ## License

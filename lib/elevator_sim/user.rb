@@ -2,14 +2,15 @@
 
 module ElevatorSim
   class User
-    attr_reader :id, :origin_floor, :destination_floor, :spawn_time
+    attr_reader :id, :start_floor, :origin_floor, :destination_floor, :spawn_time
     attr_reader :current_state, :wait_start_time, :ride_start_time, :completion_time
 
     STATES = %i[waiting_for_elevator riding_elevator completed].freeze
 
-    def initialize(id:, origin_floor:, destination_floor:, spawn_time:)
-      @id = id
-      @origin_floor = origin_floor
+    def initialize(start_floor:, destination_floor:, spawn_time:, id: nil)
+      @id = id || object_id
+      @start_floor = start_floor
+      @origin_floor = start_floor # For backward compatibility
       @destination_floor = destination_floor
       @spawn_time = spawn_time
 
@@ -17,7 +18,8 @@ module ElevatorSim
       @wait_start_time = spawn_time
       @ride_start_time = nil
       @completion_time = nil
-      @current_floor = origin_floor
+      @current_floor = start_floor
+      @button_pressed_time = nil
     end
 
     def waiting?
@@ -33,11 +35,27 @@ module ElevatorSim
     end
 
     def going_up?
-      @destination_floor > @origin_floor
+      @destination_floor > @start_floor
     end
 
     def going_down?
-      @destination_floor < @origin_floor
+      @destination_floor < @start_floor
+    end
+
+    def state
+      @current_state
+    end
+
+    def can_press_button?(current_time)
+      @button_pressed_time.nil?
+    end
+
+    def press_button(current_time)
+      @button_pressed_time = current_time
+    end
+
+    def update(current_time)
+      # Update any time-based logic for the user
     end
 
     def board_elevator(current_time)
@@ -88,7 +106,7 @@ module ElevatorSim
       when :completed then "✅"
       end
 
-      "User #{@id} [#{state_symbol}] #{@origin_floor}#{direction_symbol}#{@destination_floor}"
+      "User #{@id} [#{state_symbol}] #{@start_floor}#{direction_symbol}#{@destination_floor}"
     end
 
     def status

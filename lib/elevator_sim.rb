@@ -7,6 +7,8 @@ require_relative "elevator_sim/queue"
 require_relative "elevator_sim/building"
 require_relative "elevator_sim/elevator"
 require_relative "elevator_sim/user"
+require_relative "elevator_sim/algorithm"
+require_relative "elevator_sim/simulation"
 
 module ElevatorSim
 end

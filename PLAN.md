@@ -31,8 +31,8 @@ A Ruby CLI application that simulates elevator systems with user-provided algori
 - [x] Implement Building class with configurable floors and elevator setup
 - [x] Create Elevator class with movement, door timing, and floor range logic
 - [x] Implement User/Passenger class with spawn rates and movement patterns
-- [ ] Create pluggable algorithm interface for user-provided elevator algorithms
-- [ ] Build simulation engine to orchestrate elevators, users, and timing
+- [x] Create pluggable algorithm interface for user-provided elevator algorithms
+- [x] Build simulation engine to orchestrate elevators, users, and timing
 - [ ] Implement statistics tracking system for performance metrics
 
 ### 5. User Interface & Finalization

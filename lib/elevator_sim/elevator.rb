@@ -3,7 +3,7 @@
 module ElevatorSim
   class Elevator
     attr_reader :id, :capacity, :speed, :door_open_time, :door_close_time, :service_floors
-    attr_reader :current_floor, :passengers, :state, :target_floor
+    attr_reader :current_floor, :passengers, :state, :target_floor, :active_time
 
     STATES = %i[idle moving_up moving_down doors_opening doors_closing].freeze
 
@@ -20,6 +20,7 @@ module ElevatorSim
       @state = :idle
       @target_floor = nil
       @state_timer = 0.0
+      @active_time = 0.0
     end
 
     def can_service_floor?(floor)
@@ -86,13 +87,25 @@ module ElevatorSim
       true
     end
 
+    def remove_passenger(passenger)
+      @passengers.delete(passenger)
+    end
+
     def remove_passengers_for_floor(floor)
       passengers_leaving = @passengers.select { |p| p[:destination_floor] == floor }
       @passengers.reject! { |p| p[:destination_floor] == floor }
       passengers_leaving
     end
 
-    def update(time_delta)
+    def stop
+      @state = :idle
+      @target_floor = nil
+    end
+
+    def update(time_delta = 0.1)
+      # Track active time when not idle
+      @active_time += time_delta unless @state == :idle
+
       case @state
       when :moving_up, :moving_down
         update_movement(time_delta)

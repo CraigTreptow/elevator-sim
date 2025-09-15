@@ -48,6 +48,20 @@ module ElevatorSim
       @elevators.find { |e| e.id == elevator_id }
     end
 
+    def find_elevator(elevator_id)
+      elevator_by_id(elevator_id)
+    end
+
+    def add_user_to_floor(user, floor)
+      raise "Invalid floor: #{floor}" unless valid_floor?(floor)
+
+      @waiting_queues[floor] << user
+    end
+
+    def remove_user_from_floor(user, floor)
+      @waiting_queues[floor]&.delete(user)
+    end
+
     def to_s
       <<~BUILDING
         Building:

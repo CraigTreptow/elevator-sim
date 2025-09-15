@@ -33,6 +33,24 @@ bundle exec ruby -e "require_relative 'lib/elevator_sim'; config = ElevatorSim::
 bundle exec ruby -e "require_relative 'lib/elevator_sim'; queue = ElevatorSim::Queue.load('queues/default.json'); puts queue.people.first"
 ```
 
+### Algorithm Development Commands
+```bash
+# Test algorithm loading
+bundle exec ruby -e "require_relative 'lib/elevator_sim'; config = ElevatorSim::Configuration.load('config/default.toml'); building = ElevatorSim::Building.new(config); algorithm = ElevatorSim::AlgorithmLoader.load_from_file('algorithms/fifo.rb', building, config); puts algorithm.class.name"
+
+# Validate algorithm syntax
+bundle exec ruby -c algorithms/fifo.rb
+```
+
+### Simulation Engine Commands
+```bash
+# Test simulation components
+bundle exec ruby -e "require_relative 'lib/elevator_sim'; config = ElevatorSim::Configuration.load('config/default.toml'); building = ElevatorSim::Building.new(config); puts building.status"
+
+# Test simulation engine
+bundle exec ruby -e "require_relative 'lib/elevator_sim'; config = ElevatorSim::Configuration.load('config/default.toml'); algorithm = ElevatorSim::AlgorithmLoader.load_from_file('algorithms/fifo.rb', nil, config); simulation = ElevatorSim::Simulation.new(config, algorithm); puts simulation.statistics"
+```
+
 ### Linting and Type Checking
 ```bash
 bundle exec standardrb --fix  # Ruby linting with Standard

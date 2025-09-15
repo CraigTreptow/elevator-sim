@@ -10,6 +10,7 @@ module ElevatorSim
       @config = config
       @people = []
       @metadata = {}
+      @current_index = 0
     end
 
     def self.generate(config)
@@ -23,6 +24,7 @@ module ElevatorSim
       queue = allocate
       queue.instance_variable_set(:@people, data["people"])
       queue.instance_variable_set(:@metadata, data["metadata"])
+      queue.instance_variable_set(:@current_index, 0)
       queue
     end
 
@@ -53,7 +55,7 @@ module ElevatorSim
         @people << {
           "id" => person_id,
           "spawn_time" => current_time.round(1),
-          "origin_floor" => origin_floor,
+          "start_floor" => origin_floor,
           "destination_floor" => destination_floor
         }
 
@@ -68,6 +70,30 @@ module ElevatorSim
       }
 
       File.write(file_path, JSON.pretty_generate(data))
+    end
+
+    def peek_next_user(current_time)
+      return nil if @current_index >= @people.length
+
+      next_person = @people[@current_index]
+      return nil if next_person["spawn_time"] > current_time
+
+      {
+        id: next_person["id"],
+        spawn_time: next_person["spawn_time"],
+        start_floor: next_person["start_floor"],
+        destination_floor: next_person["destination_floor"]
+      }
+    end
+
+    def pop_next_user
+      return nil if @current_index >= @people.length
+
+      @current_index += 1
+    end
+
+    def reset
+      @current_index = 0
     end
 
     private

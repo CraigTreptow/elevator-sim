@@ -54,6 +54,10 @@ module ElevatorSim
       @data.dig("simulation", "duration_minutes")
     end
 
+    def simulation_duration_minutes
+      duration_minutes
+    end
+
     def user_spawn_rate
       @data.dig("simulation", "user_spawn_rate")
     end
