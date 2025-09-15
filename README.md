@@ -141,7 +141,7 @@ Statistics:
 ✅ Dependencies and fancy CLI components (TTY toolkit, StandardRB)  
 ✅ TOML configuration system with accessor methods  
 ✅ Queue management system with reproducible people generation  
-⚠️ Core simulation classes - Elevator class created with movement and state logic  
+⚠️ Core simulation classes - User class created with state tracking and statistics  
 🔲 Real-time visualization
 
 ## License
