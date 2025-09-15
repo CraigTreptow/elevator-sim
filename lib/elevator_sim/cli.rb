@@ -19,6 +19,7 @@ module ElevatorSim
       puts "  generate-queue  Generate a reproducible queue of people"
       puts "  show-queue      Display queue contents"
       puts "  list-queues     List all available queues"
+      puts "  show-building   Display building configuration"
       puts "  init            Create configuration wizard"
       puts "  version         Show version"
       puts
@@ -26,6 +27,7 @@ module ElevatorSim
       puts "  elevator-sim generate-queue --name rush_hour"
       puts "  elevator-sim show-queue --name rush_hour"
       puts "  elevator-sim list-queues"
+      puts "  elevator-sim show-building"
       puts
       puts "Use 'elevator-sim [command] --help' for more information"
     end
@@ -42,6 +44,8 @@ module ElevatorSim
         show_queue_command(args)
       when "list-queues"
         list_queues_command(args)
+      when "show-building"
+        show_building_command(args)
       when "version"
         puts "v#{VERSION}"
       else
@@ -149,6 +153,23 @@ module ElevatorSim
 
         puts
         puts "Use with: ./bin/elevator-sim show-queue --name <queue_name>"
+      rescue => e
+        puts "❌ Error: #{e.message}"
+      end
+    end
+
+    def show_building_command(args)
+      config_file = extract_option(args, "--config") || "config/default.toml"
+
+      puts "🏢 Building Configuration"
+      puts "  Config: #{config_file}"
+      puts
+
+      begin
+        config = Configuration.load(config_file)
+        building = Building.new(config)
+
+        puts building
       rescue => e
         puts "❌ Error: #{e.message}"
       end
