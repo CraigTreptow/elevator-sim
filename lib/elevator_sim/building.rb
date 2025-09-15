@@ -48,6 +48,28 @@ module ElevatorSim
       @elevators.find { |e| e.id == elevator_id }
     end
 
+    def to_s
+      <<~BUILDING
+        Building:
+          Floors: #{@floors} (#{floor_range})
+          Basement floors: #{@basement_floors}
+          Total floors: #{total_floors}
+          Elevators: #{@elevators.length}
+          Waiting queues: #{@waiting_queues.keys.length} floors
+      BUILDING
+    end
+
+    def status
+      {
+        floors: @floors,
+        basement_floors: @basement_floors,
+        total_floors: total_floors,
+        floor_range: floor_range,
+        elevator_count: @elevators.length,
+        waiting_queues: @waiting_queues.transform_values(&:length)
+      }
+    end
+
     private
 
     def initialize_waiting_queues
