@@ -79,9 +79,20 @@ module ElevatorSim
     end
 
     def create_elevators
-      # TODO: Create elevators when Elevator class is implemented
-      # For now, just initialize empty array
-      @elevators = []
+      elevator_count = @config.elevator_count
+
+      (1..elevator_count).each do |id|
+        elevator = Elevator.new(
+          id: id,
+          capacity: @config.elevator_capacity,
+          speed: @config.elevator_speed,
+          door_open_time: @config.door_open_time,
+          door_close_time: @config.door_close_time,
+          service_floors: @config.service_floors || floor_range.to_a
+        )
+
+        @elevators << elevator
+      end
     end
   end
 end
