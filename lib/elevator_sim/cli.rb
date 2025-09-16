@@ -27,6 +27,7 @@ module ElevatorSim
       puts "  elevator-sim run --config config/default.toml --algorithm algorithms/fifo.rb"
       puts "  elevator-sim simulate --algorithm algorithms/fifo.rb --interactive"
       puts "  elevator-sim simulate --algorithm algorithms/fifo.rb --interactive --visual"
+      puts "  elevator-sim simulate --algorithm algorithms/fifo.rb --visual"
       puts "  elevator-sim generate-queue --name rush_hour"
       puts "  elevator-sim show-queue --name rush_hour"
       puts "  elevator-sim list-queues"
@@ -276,6 +277,9 @@ module ElevatorSim
           puts "  Avg Wait Time: #{stats[:average_wait_time].round(2)}s"
           puts "  Avg Ride Time: #{stats[:average_ride_time].round(2)}s"
           puts "  Utilization: #{(stats[:elevator_utilization] * 100).round(1)}%"
+        elsif visual
+          visualization = Visualization.new(building)
+          run_visual_automatic_simulation(simulation, config, visualization)
         else
           simulation.run
         end
@@ -332,6 +336,49 @@ module ElevatorSim
         print "\nPress Enter for next step (or 'quit'): "
         input = $stdin.gets
         break if input.nil? || input.chomp.downcase == "quit"
+      end
+    end
+
+    def run_visual_automatic_simulation(simulation, config, visualization)
+      puts "🎬 Visual automatic mode - Watch the simulation run in real-time"
+      puts "    Press Ctrl+C to exit early"
+      puts "    Initializing visualization..."
+      sleep(1)
+
+      visualization.clear_screen
+
+      update_frequency = 0.2  # Update every 200ms for smooth animation
+      last_update = Time.now
+
+      begin
+        loop do
+          simulation.step_simulation
+
+          # Update visualization at regular intervals
+          current_time = Time.now
+          if current_time - last_update >= update_frequency
+            state = simulation.current_state
+            visualization.render_frame(state)
+            last_update = current_time
+          end
+
+          break if simulation.current_state[:time] >= config.duration_minutes * 60
+
+          # Small sleep to prevent excessive CPU usage
+          sleep(0.05)
+        end
+
+        # Final update
+        state = simulation.current_state
+        visualization.render_frame(state)
+
+        # Show final statistics
+        puts "\n\n📊 Final Simulation Results:"
+        simulation.generate_statistics
+      rescue Interrupt
+        puts "\n\n⏹️  Simulation interrupted by user"
+        puts "\n📊 Partial Results:"
+        simulation.generate_statistics
       end
     end
   end
