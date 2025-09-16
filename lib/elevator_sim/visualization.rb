@@ -107,13 +107,13 @@ module ElevatorSim
       # Get people waiting on this floor
       people_count = count_people_waiting_on_floor(floor, state)
 
-      # Build elevator indicators
+      # Build elevator indicators with fixed width
       elevator_section = build_elevator_indicators(elevators_on_floor)
 
-      # Build people indicators
+      # Build people indicators with fixed width
       people_section = build_people_indicators(people_count)
 
-      # Combine sections
+      # Combine sections with consistent spacing
       "#{floor_label} │ #{elevator_section} │ #{people_section}"
     end
 
@@ -133,16 +133,18 @@ module ElevatorSim
     def build_elevator_indicators(elevators)
       indicators = []
 
-      # Show up to 4 elevators per floor
+      # Show up to 4 elevators per floor, each taking exactly 4 characters
       (1..4).each do |position|
         indicators << if (elevator = elevators[position - 1])
           format_elevator_indicator(elevator)
         else
-          "    "  # Empty space
+          "    "  # Exactly 4 spaces
         end
       end
 
-      indicators.join(" ")
+      # Join with single spaces, total width: 4*4 + 3*1 = 19 characters
+      result = indicators.join(" ")
+      result.ljust(19)  # Ensure exactly 19 characters
     end
 
     def format_elevator_indicator(elevator)
@@ -168,13 +170,26 @@ module ElevatorSim
 
     def build_people_indicators(count)
       if count == 0
-        @pastel.dim("         ")
+        " " * 25  # Fixed width for empty
       else
-        people_str = "👤" * [count, 5].min  # Max 5 icons
-        if count > 5
-          people_str += @pastel.dim("(#{count})")
+        # Build the people string
+        people_str = if count <= 5
+          "👤" * count
+        else
+          "👤" * 5 + @pastel.dim("(#{count})")
         end
-        people_str.ljust(9)
+
+        # Pad or truncate to exactly 25 characters (accounting for emoji width)
+        # Each 👤 emoji takes 2 display characters
+        visible_length = calculate_display_width(people_str)
+        padding_needed = 25 - visible_length
+
+        if padding_needed > 0
+          people_str + (" " * padding_needed)
+        else
+          # Truncate if too long (shouldn't happen with our limits)
+          truncate_to_width(people_str, 25)
+        end
       end
     end
 
@@ -217,11 +232,13 @@ module ElevatorSim
 
     def format_stat_line(label, value, percentage, unit)
       bar = build_progress_bar(percentage)
-      "#{label.ljust(15)} #{bar} #{value}"
+      value_str = value.to_s.ljust(12)  # Fixed width for values
+      "#{label.ljust(15)} #{bar} #{value_str}"
     end
 
     def format_simple_stat(label, value)
-      "#{label.ljust(15)} #{@pastel.bright_white(value)}"
+      value_str = @pastel.bright_white(value.to_s).ljust(22)  # Account for color codes
+      "#{label.ljust(15)} #{value_str}"
     end
 
     def build_progress_bar(percentage, width = 10)
@@ -253,6 +270,33 @@ module ElevatorSim
         20
       else
         0
+      end
+    end
+
+    def calculate_display_width(string)
+      # Remove ANSI color codes and calculate display width
+      clean_string = string.gsub(/\e\[[0-9;]*m/, "")
+
+      # Count characters, treating emojis as 2 characters wide
+      width = 0
+      clean_string.each_char do |char|
+        # Check if character is an emoji (rough approximation)
+        width += if char.ord > 0x1F000
+          2
+        else
+          1
+        end
+      end
+      width
+    end
+
+    def truncate_to_width(string, max_width)
+      # Simple truncation - could be improved for emoji handling
+      if calculate_display_width(string) <= max_width
+        string
+      else
+        # Crude truncation, might break emojis
+        string[0...(max_width - 3)] + "..."
       end
     end
   end
