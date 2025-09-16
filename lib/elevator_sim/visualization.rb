@@ -107,12 +107,16 @@ module ElevatorSim
       # Get people waiting on this floor
       people_count = count_people_waiting_on_floor(floor, state)
 
-      # Build sections with fixed widths
-      elevator_section = build_elevator_indicators(elevators_on_floor).ljust(20)
-      people_section = build_people_indicators(people_count).ljust(25)
+      # Build sections with spacing
+      elevator_section = build_elevator_indicators(elevators_on_floor)
+      people_section = build_people_indicators(people_count)
 
-      # Combine: floor(8) + " │ " + elevators(20) + " │ " + people(25) = 58 chars
-      "#{floor_label} │ #{elevator_section} │ #{people_section}"
+      # Clean format with just spacing
+      line_parts = [floor_label]
+      line_parts << elevator_section unless elevator_section.empty?
+      line_parts << people_section unless people_section.empty?
+      
+      line_parts.join("  ")
     end
 
     def get_elevators_on_floor(floor, state)
