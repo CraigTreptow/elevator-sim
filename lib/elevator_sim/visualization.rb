@@ -98,8 +98,10 @@ module ElevatorSim
     end
 
     def build_floor_line(floor, state, floor_width)
-      floor_label = sprintf("Floor %#{floor_width}s", floor)
-      floor_label = @pastel.dim(floor_label)
+      # Create floor label without color first, then apply color to the entire padded string
+      raw_floor_label = sprintf("Floor %#{floor_width}s", floor)
+      # Pad the raw label to exactly 8 characters, then apply color
+      floor_label = @pastel.dim(raw_floor_label.ljust(8))
 
       # Get elevators on this floor
       elevators_on_floor = get_elevators_on_floor(floor, state)
