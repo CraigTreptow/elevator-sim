@@ -71,8 +71,8 @@ module ElevatorSim
       TTY::Box.frame(
         width: [@screen.width - 4, 60].min,
         border: :light,
-        padding: [0, 1]
-      ) { header }
+        padding: 0
+      ) { " " + header + " " }
     end
 
     def build_building_view(state)
@@ -86,14 +86,14 @@ module ElevatorSim
         building_lines << line
       end
 
-      # Frame the building
-      building_content = building_lines.join("\n")
+      # Frame the building with manual padding
+      building_content = building_lines.map { |line| " #{line} " }.join("\n")
 
       TTY::Box.frame(
         width: [@screen.width - 4, 80].min,
         border: :light,
         title: {top_left: " Building View "},
-        padding: [0, 1]
+        padding: 0
       ) { building_content }
     end
 
@@ -170,7 +170,7 @@ module ElevatorSim
 
     def build_people_indicators(count)
       if count == 0
-        " " * 25  # Fixed width for empty
+        " " * 40  # Fixed width for empty
       else
         # Build the people string
         people_str = if count <= 5
@@ -179,16 +179,16 @@ module ElevatorSim
           "👤" * 5 + @pastel.dim("(#{count})")
         end
 
-        # Pad or truncate to exactly 25 characters (accounting for emoji width)
-        # Each 👤 emoji takes 2 display characters
-        visible_length = calculate_display_width(people_str)
-        padding_needed = 25 - visible_length
+        # Simple padding to fixed width - emojis are 1 char in this terminal
+        # Remove ANSI codes for length calculation
+        clean_str = people_str.gsub(/\e\[[0-9;]*m/, "")
+        padding_needed = 40 - clean_str.length
 
         if padding_needed > 0
           people_str + (" " * padding_needed)
         else
-          # Truncate if too long (shouldn't happen with our limits)
-          truncate_to_width(people_str, 25)
+          # Truncate if too long
+          people_str[0...37] + "..."
         end
       end
     end
@@ -226,8 +226,8 @@ module ElevatorSim
         width: [@screen.width - 4, 60].min,
         border: :light,
         title: {top_left: " Statistics "},
-        padding: [0, 1]
-      ) { stats_content }
+        padding: 0
+      ) { " " + stats_content.gsub("\n", "\n ") + " " }
     end
 
     def format_stat_line(label, value, percentage, unit)
@@ -237,8 +237,9 @@ module ElevatorSim
     end
 
     def format_simple_stat(label, value)
-      value_str = @pastel.bright_white(value.to_s).ljust(22)  # Account for color codes
-      "#{label.ljust(15)} #{value_str}"
+      # Don't try to pad colored text - just use fixed positioning
+      colored_value = @pastel.bright_white(value.to_s)
+      "#{label.ljust(15)} #{colored_value}"
     end
 
     def build_progress_bar(percentage, width = 10)
