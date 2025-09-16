@@ -154,7 +154,7 @@ module ElevatorSim
         if elevator.passengers.any?
           @pastel.blue("█#{id}")
         else
-          @pastel.dim("│#{id}")
+          @pastel.dim("□#{id}")
         end
       else
         @pastel.magenta("?#{id}")
