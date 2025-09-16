@@ -53,6 +53,9 @@ bundle exec ruby -e "require_relative 'lib/elevator_sim'; config = ElevatorSim::
 # Interactive step-by-step simulation
 ./bin/elevator-sim simulate --algorithm algorithms/fifo.rb --interactive
 
+# Interactive simulation with real-time visualization
+./bin/elevator-sim simulate --algorithm algorithms/fifo.rb --interactive --visual
+
 # Run with custom queue
 ./bin/elevator-sim run --algorithm algorithms/fifo.rb --queue test
 ```

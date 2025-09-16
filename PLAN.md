@@ -45,7 +45,7 @@ A Ruby CLI application that simulates elevator systems with user-provided algori
 - [x] Create example algorithms and TOML configuration files
 - [x] Working CLI simulation with statistics output
 - [x] Interactive step-by-step simulation mode with `--interactive` flag
-- [ ] Create real-time visualization showing elevator positions and states
+- [x] Create real-time visualization showing elevator positions and states with clean layout
 
 ## Configuration Structure (TOML)
 ```toml
@@ -78,14 +78,15 @@ button_press_delay = 0.5
 - Algorithm comparison reports
 
 ## CLI Visualization Features
-- **Real-time building view** showing elevator positions per floor
+- **Clean real-time building view** with horizontal separators (no vertical borders)
 - **Elevator state indicators**:
   - `▲E1` = Moving up
   - `▼E1` = Moving down  
-  - `═E1═` = Stopped (doors closed)
-  - `◉E1` = Stopped (doors open)
-  - `│E1│` = Idle/waiting
-- **Passenger indicators** (`👤👤`) showing people waiting per floor
-- **Live statistics dashboard** with progress bars and metrics
-- **Interactive controls** for pause/resume/speed adjustment
+  - `◉E1` = Doors open/loading
+  - `█E1` = Occupied but idle
+  - `□E1` = Empty and idle
+- **Passenger indicators** (`👤👤`) showing people waiting per floor (up to 5 visible)
+- **Live statistics dashboard** with progress bars and real-time metrics
+- **Interactive step control** for pause/resume simulation
 - **Color coding** for different elevator states and performance metrics
+- **Simplified layout** eliminates vertical border alignment issues

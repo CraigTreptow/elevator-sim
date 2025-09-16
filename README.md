@@ -224,27 +224,51 @@ See `algorithms/fifo.rb` for a complete example implementing First In, First Out
 
 ## Real-time Visualization
 
-The interactive mode shows:
+Run with `--visual` flag for live interactive display:
+
+```bash
+./bin/elevator-sim simulate --algorithm algorithms/fifo.rb --interactive --visual
+```
+
+The visualization shows a clean, real-time view:
 
 ```
-┌─ Elevator Simulation ──────── 15:30 elapsed ──┐
-│ Floor 10 │ ▲E1  │     │     │ │ 👤👤    │ Wait │
-│ Floor 9  │     │ ▼E2  │     │ │ 👤      │ 2.3s │
-│ Floor 8  │     │     │ ═E3═ │ │         │ 1.1s │
-│ Floor 7  │     │     │     │ │ 👤👤👤  │ 4.2s │
-└──────────────────────────────────────────────────┘
+────────────────────────────────────────────────────────────
+🏢 Elevator Simulation | 15.3s elapsed (0.3min)
+────────────────────────────────────────────────────────────
 
-Statistics:
-▓▓▓▓▓▓▓░░░ 67% - Average Wait Time: 2.8s
-▓▓▓▓▓▓▓▓░░ 82% - Elevator Utilization
+Building View
+──────────────────────────────
+Floor 10
+Floor  9
+Floor  8
+Floor  7  ▲E1
+Floor  6  
+Floor  5  ◉E2 👤👤
+Floor  4
+Floor  3  
+Floor  2
+Floor  1
+Floor  0
+Floor -1
+
+📊 Live Statistics
+──────────────────────────────
+👥 Users         ▓▓▓▓▓▓░░░░ 12/18       
+⏳ Avg Wait      ▓▓▓▓▓▓▓▓░░ 4.2s        
+📈 Utilization   ▓▓▓▓▓▓▓▓▓░ 87.5%       
+📞 Active Calls  3
 ```
 
 **Elevator States:**
 - `▲E1` Moving up
 - `▼E1` Moving down  
-- `═E1═` Stopped (doors closed)
-- `◉E1` Stopped (doors open)
-- `│E1│` Idle/waiting
+- `◉E1` Doors open/loading
+- `█E1` Occupied but idle
+- `□E1` Empty and idle
+
+**User Indicators:**
+- `👤` Waiting passengers (shows up to 5, with count for more)
 
 ## Development Status
 
@@ -258,7 +282,7 @@ Statistics:
 ✅ Working CLI simulation with comprehensive statistics output
 ✅ Interactive step-by-step simulation mode with `--interactive` flag
 ✅ FIFO algorithm example implementation with comprehensive API documentation
-🔲 Real-time visualization with fancy terminal UI
+✅ Real-time visualization with clean terminal UI and live statistics
 
 ## Understanding Statistics
 
