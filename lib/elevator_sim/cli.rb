@@ -26,6 +26,7 @@ module ElevatorSim
       puts "Examples:"
       puts "  elevator-sim run --config config/default.toml --algorithm algorithms/fifo.rb"
       puts "  elevator-sim simulate --algorithm algorithms/fifo.rb --interactive"
+      puts "  elevator-sim simulate --algorithm algorithms/fifo.rb --interactive --visual"
       puts "  elevator-sim generate-queue --name rush_hour"
       puts "  elevator-sim show-queue --name rush_hour"
       puts "  elevator-sim list-queues"
@@ -235,12 +236,14 @@ module ElevatorSim
       algorithm_file = extract_option(args, "--algorithm") || "algorithms/fifo.rb"
       queue_name = extract_option(args, "--queue")
       interactive = extract_flag(args, "--interactive")
+      visual = extract_flag(args, "--visual")
 
       puts "🎮 Interactive simulation..."
       puts "  Config: #{config_file}"
       puts "  Algorithm: #{algorithm_file}"
       puts "  Queue: #{queue_name || "Generated on-the-fly"}"
       puts "  Interactive: #{interactive ? "Yes" : "No"}"
+      puts "  Visual: #{visual ? "Yes" : "No"}"
       puts
 
       begin
@@ -259,28 +262,11 @@ module ElevatorSim
         simulation = Simulation.new(config, algorithm, queue)
 
         if interactive
-          puts "🔄 Interactive mode - Press Enter to step through simulation"
-          puts "    Type 'quit' to exit early"
-
-          step_count = 0
-          loop do
-            simulation.step_simulation
-            step_count += 1
-
-            state = simulation.current_state
-            puts "\n--- Step #{step_count} (#{state[:time].round(1)}s) ---"
-            puts "Active users: #{state[:users].length}"
-            puts "Call requests: #{state[:call_requests].length}"
-
-            state[:building].elevators.each do |elevator|
-              puts "  #{elevator}"
-            end
-
-            break if state[:time] >= config.duration_minutes * 60
-
-            print "\nPress Enter for next step (or 'quit'): "
-            input = $stdin.gets
-            break if input.nil? || input.chomp.downcase == "quit"
+          if visual
+            visualization = Visualization.new(building)
+            run_visual_interactive_simulation(simulation, config, visualization)
+          else
+            run_text_interactive_simulation(simulation, config)
           end
 
           puts "\n📊 Final Statistics:"
@@ -296,6 +282,56 @@ module ElevatorSim
       rescue => e
         puts "❌ Error: #{e.message}"
         puts e.backtrace.first(5).join("\n") if ENV["DEBUG"]
+      end
+    end
+
+    def run_text_interactive_simulation(simulation, config)
+      puts "🔄 Interactive mode - Press Enter to step through simulation"
+      puts "    Type 'quit' to exit early"
+
+      step_count = 0
+      loop do
+        simulation.step_simulation
+        step_count += 1
+
+        state = simulation.current_state
+        puts "\n--- Step #{step_count} (#{state[:time].round(1)}s) ---"
+        puts "Active users: #{state[:users].length}"
+        puts "Call requests: #{state[:call_requests].length}"
+
+        state[:building].elevators.each do |elevator|
+          puts "  #{elevator}"
+        end
+
+        break if state[:time] >= config.duration_minutes * 60
+
+        print "\nPress Enter for next step (or 'quit'): "
+        input = $stdin.gets
+        break if input.nil? || input.chomp.downcase == "quit"
+      end
+    end
+
+    def run_visual_interactive_simulation(simulation, config, visualization)
+      puts "🎨 Visual interactive mode - Press Enter to step through simulation"
+      puts "    Type 'quit' to exit early"
+      puts "    Initializing visualization..."
+      sleep(1)
+
+      visualization.clear_screen
+
+      step_count = 0
+      loop do
+        simulation.step_simulation
+        step_count += 1
+
+        state = simulation.current_state
+        visualization.render_frame(state)
+
+        break if state[:time] >= config.duration_minutes * 60
+
+        print "\nPress Enter for next step (or 'quit'): "
+        input = $stdin.gets
+        break if input.nil? || input.chomp.downcase == "quit"
       end
     end
   end
