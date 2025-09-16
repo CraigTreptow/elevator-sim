@@ -10,7 +10,7 @@ capacity = 8
 speed_floors_per_second = 2.0
 door_open_time = 2.5
 door_close_time = 2.0
-service_floors = [1, 10]
+# service_floors = [1, 10]  # Comment out to service all floors
 
 [simulation]
 duration_minutes = 10

@@ -21,7 +21,6 @@ module ElevatorSim
 
       while @running && @current_time < duration_seconds
         step_simulation
-        @current_time += time_step
       end
 
       finalize_simulation
@@ -42,13 +41,19 @@ module ElevatorSim
       apply_assignments(assignments)
 
       # 5. Update elevator positions and states
-      @building.elevators.each(&:update)
+      @building.elevators.each { |elevator| elevator.update(time_step) }
 
-      # 6. Update user states and timing
+      # 6. Handle elevator arrivals and boarding
+      handle_elevator_arrivals
+
+      # 7. Update user states and timing
       @users.each { |user| user.update(@current_time) }
 
-      # 7. Remove completed users
+      # 8. Remove completed users
       remove_completed_users
+
+      # 9. Advance time
+      @current_time += time_step
     end
 
     def stop
@@ -174,14 +179,46 @@ module ElevatorSim
         case assignment[:action]
         when :move_to_floor
           elevator.move_to_floor(assignment[:target_floor])
-          # Remove satisfied call requests
-          remove_satisfied_calls(assignment[:target_floor])
+          # Don't remove call requests until elevator actually arrives and opens doors
         when :stop
           elevator.stop
         when :open_doors
           elevator.open_doors
         when :close_doors
           elevator.close_doors
+        end
+      end
+    end
+
+    def handle_elevator_arrivals
+      @building.elevators.each do |elevator|
+        # Check if elevator has just arrived at a floor and is idle (not moving)
+        if elevator.state == :idle && elevator.target_floor.nil?
+          floor = elevator.current_floor
+
+          # Find users waiting on this floor who want to board this elevator
+          waiting_users = @users.select do |user|
+            user.state == :waiting_for_elevator &&
+              user.start_floor == floor &&
+              elevator.can_service_floor?(user.destination_floor)
+          end
+
+          if waiting_users.any? && !elevator.full?
+            elevator.open_doors
+
+            # Board users
+            waiting_users.each do |user|
+              if elevator.add_passenger(user)
+                user.board_elevator(@current_time)
+
+                # Remove this user's call request
+                @call_requests.reject! do |req|
+                  req[:user] == user
+                end
+              end
+              break if elevator.full?
+            end
+          end
         end
       end
     end

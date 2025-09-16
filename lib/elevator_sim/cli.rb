@@ -24,6 +24,8 @@ module ElevatorSim
       puts "  version         Show version"
       puts
       puts "Examples:"
+      puts "  elevator-sim run --config config/default.toml --algorithm algorithms/fifo.rb"
+      puts "  elevator-sim simulate --algorithm algorithms/fifo.rb --interactive"
       puts "  elevator-sim generate-queue --name rush_hour"
       puts "  elevator-sim show-queue --name rush_hour"
       puts "  elevator-sim list-queues"
@@ -38,6 +40,10 @@ module ElevatorSim
       command = args.shift
 
       case command
+      when "run"
+        run_simulation_command(args)
+      when "simulate"
+        simulate_command(args)
       when "generate-queue"
         generate_queue_command(args)
       when "show-queue"
@@ -98,7 +104,8 @@ module ElevatorSim
         puts "\nPeople (showing first #{limit}):"
         queue.people.first(limit).each do |person|
           time = sprintf("%.1f", person["spawn_time"])
-          puts "  Person #{person["id"]}: t=#{time}s, Floor #{person["origin_floor"]}→#{person["destination_floor"]}"
+          start_floor = person["start_floor"] || person["origin_floor"] # Handle both old and new format
+          puts "  Person #{person["id"]}: t=#{time}s, Floor #{start_floor}→#{person["destination_floor"]}"
         end
 
         if queue.people.length > limit
@@ -172,6 +179,115 @@ module ElevatorSim
         puts building
       rescue => e
         puts "❌ Error: #{e.message}"
+      end
+    end
+
+    def run_simulation_command(args)
+      config_file = extract_option(args, "--config") || "config/default.toml"
+      algorithm_file = extract_option(args, "--algorithm") || "algorithms/fifo.rb"
+      queue_name = extract_option(args, "--queue")
+
+      puts "🏃 Running simulation..."
+      puts "  Config: #{config_file}"
+      puts "  Algorithm: #{algorithm_file}"
+      puts "  Queue: #{queue_name || "Generated on-the-fly"}"
+      puts
+
+      begin
+        config = Configuration.load(config_file)
+        building = Building.new(config)
+        algorithm = AlgorithmLoader.load_from_file(algorithm_file, building, config)
+
+        # Load or generate queue
+        queue = if queue_name
+          queue_file = queue_name.end_with?(".json") ? "queues/#{queue_name}" : "queues/#{queue_name}.json"
+          Queue.load(queue_file)
+        else
+          Queue.generate(config)
+        end
+
+        simulation = Simulation.new(config, algorithm, queue)
+
+        puts "▶️  Starting simulation (#{config.duration_minutes} minutes)..."
+        start_time = Time.now
+
+        simulation.run
+
+        end_time = Time.now
+        puts
+        puts "✅ Simulation completed in #{(end_time - start_time).round(2)}s"
+      rescue => e
+        puts "❌ Error: #{e.message}"
+        puts e.backtrace.first(5).join("\n") if ENV["DEBUG"]
+      end
+    end
+
+    def simulate_command(args)
+      config_file = extract_option(args, "--config") || "config/default.toml"
+      algorithm_file = extract_option(args, "--algorithm") || "algorithms/fifo.rb"
+      queue_name = extract_option(args, "--queue")
+      interactive = args.include?("--interactive")
+
+      puts "🎮 Interactive simulation..."
+      puts "  Config: #{config_file}"
+      puts "  Algorithm: #{algorithm_file}"
+      puts "  Queue: #{queue_name || "Generated on-the-fly"}"
+      puts "  Interactive: #{interactive ? "Yes" : "No"}"
+      puts
+
+      begin
+        config = Configuration.load(config_file)
+        building = Building.new(config)
+        algorithm = AlgorithmLoader.load_from_file(algorithm_file, building, config)
+
+        # Load or generate queue
+        queue = if queue_name
+          queue_file = queue_name.end_with?(".json") ? "queues/#{queue_name}" : "queues/#{queue_name}.json"
+          Queue.load(queue_file)
+        else
+          Queue.generate(config)
+        end
+
+        simulation = Simulation.new(config, algorithm, queue)
+
+        if interactive
+          puts "🔄 Interactive mode - Press Enter to step through simulation"
+          puts "    Type 'quit' to exit early"
+
+          step_count = 0
+          loop do
+            simulation.step_simulation
+            step_count += 1
+
+            state = simulation.current_state
+            puts "\n--- Step #{step_count} (#{state[:time].round(1)}s) ---"
+            puts "Active users: #{state[:users].length}"
+            puts "Call requests: #{state[:call_requests].length}"
+
+            state[:building].elevators.each do |elevator|
+              puts "  #{elevator}"
+            end
+
+            break if state[:time] >= config.duration_minutes * 60
+
+            print "\nPress Enter for next step (or 'quit'): "
+            input = gets.chomp
+            break if input.downcase == "quit"
+          end
+
+          puts "\n📊 Final Statistics:"
+          stats = simulation.statistics
+          puts "  Total Users: #{stats[:total_users]}"
+          puts "  Completed: #{stats[:completed_users]}"
+          puts "  Avg Wait Time: #{stats[:average_wait_time].round(2)}s"
+          puts "  Avg Ride Time: #{stats[:average_ride_time].round(2)}s"
+          puts "  Utilization: #{(stats[:elevator_utilization] * 100).round(1)}%"
+        else
+          simulation.run
+        end
+      rescue => e
+        puts "❌ Error: #{e.message}"
+        puts e.backtrace.first(5).join("\n") if ENV["DEBUG"]
       end
     end
   end

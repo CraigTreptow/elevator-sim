@@ -47,8 +47,14 @@ bundle exec ruby -c algorithms/fifo.rb
 # Test simulation components
 bundle exec ruby -e "require_relative 'lib/elevator_sim'; config = ElevatorSim::Configuration.load('config/default.toml'); building = ElevatorSim::Building.new(config); puts building.status"
 
-# Test simulation engine
-bundle exec ruby -e "require_relative 'lib/elevator_sim'; config = ElevatorSim::Configuration.load('config/default.toml'); algorithm = ElevatorSim::AlgorithmLoader.load_from_file('algorithms/fifo.rb', nil, config); simulation = ElevatorSim::Simulation.new(config, algorithm); puts simulation.statistics"
+# Run full simulation
+./bin/elevator-sim run --algorithm algorithms/fifo.rb
+
+# Interactive step-by-step simulation
+./bin/elevator-sim simulate --algorithm algorithms/fifo.rb --interactive
+
+# Run with custom queue
+./bin/elevator-sim run --algorithm algorithms/fifo.rb --queue test
 ```
 
 ### Linting and Type Checking
@@ -92,15 +98,29 @@ bundle exec rspec             # Run tests
 
 ## Algorithm Interface
 
-Custom algorithms should implement:
+Custom algorithms should inherit from `ElevatorSim::Algorithm`:
 ```ruby
-class CustomAlgorithm
-  def initialize(building, elevators)
-    # Setup
+class CustomAlgorithm < ElevatorSim::Algorithm
+  def initialize(building, config)
+    super
+    # Your initialization here
   end
 
   def dispatch(call_requests, elevator_states)
-    # Return elevator assignments
+    # call_requests: [{floor: 5, direction: :up, user: User, timestamp: 1.6}]
+    # elevator_states: [{id: 1, current_floor: 3, state: :idle, passengers: 2, capacity: 8}]
+    # Return: [{elevator_id: 1, action: :move_to_floor, target_floor: 5}]
+    []
   end
 end
 ```
+
+## Simulation Statistics
+
+The simulation tracks comprehensive metrics:
+- **Total Users**: Number of people spawned during simulation
+- **Completed Users**: Number who successfully reached their destination  
+- **Average Wait Time**: Time from spawn to boarding elevator
+- **Average Ride Time**: Time from boarding to alighting
+- **Average Total Time**: Total time from spawn to completion
+- **Elevator Utilization**: Percentage of time elevators are active (not idle)

@@ -25,6 +25,7 @@ module ElevatorSim
       queue.instance_variable_set(:@people, data["people"])
       queue.instance_variable_set(:@metadata, data["metadata"])
       queue.instance_variable_set(:@current_index, 0)
+      queue.instance_variable_set(:@config, nil) # Config not needed for loaded queues
       queue
     end
 

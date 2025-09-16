@@ -33,16 +33,18 @@ A Ruby CLI application that simulates elevator systems with user-provided algori
 - [x] Implement User/Passenger class with spawn rates and movement patterns
 - [x] Create pluggable algorithm interface for user-provided elevator algorithms
 - [x] Build simulation engine to orchestrate elevators, users, and timing
-- [ ] Implement statistics tracking system for performance metrics
+- [x] Implement statistics tracking system for performance metrics
 
 ### 5. User Interface & Finalization
-- [ ] Set up TTY toolkit gems for fancy CLI interface
+- [x] Set up TTY toolkit gems for fancy CLI interface
+- [x] Create CLI argument parsing and command structure (run, simulate, generate-queue, etc.)
+- [x] Add executable permissions and shebang for CLI usage
+- [x] Set up basic error handling and user-friendly output
+- [x] Create example algorithms and TOML configuration files
+- [x] Working CLI simulation with statistics output
+- [x] Interactive step-by-step simulation mode
 - [ ] Create real-time visualization showing elevator positions and states
-- [ ] Create CLI argument parsing and command structure with TTY components
-- [ ] Add executable permissions and shebang for CLI usage
 - [ ] Create .gitignore file appropriate for Ruby projects
-- [ ] Set up basic error handling and user-friendly output
-- [ ] Create example algorithms and TOML configuration files
 - [ ] Create initial commit and prepare for GitHub repository
 
 ## Configuration Structure (TOML)
