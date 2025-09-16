@@ -90,7 +90,7 @@ module ElevatorSim
       building_content = building_lines.map { |line| " #{line} " }.join("\n")
 
       TTY::Box.frame(
-        width: 60,  # Fixed width based on content: floor(8) + separators + elevators(20) + people(25) + padding
+        width: 62,  # Adjusted width: floor(8) + separators(6) + elevators(20) + people(25) + padding(3) = 62
         border: :light,
         title: {top_left: " Building View "},
         padding: 0
@@ -107,12 +107,12 @@ module ElevatorSim
       # Get people waiting on this floor
       people_count = count_people_waiting_on_floor(floor, state)
 
-      # Build sections with exact fixed widths
-      elevator_section = build_elevator_indicators(elevators_on_floor).ljust(20)
-      people_section = build_people_indicators(people_count).ljust(25)
+      # Build sections with exact fixed widths (calculate display width to handle colored text)
+      elevator_section = pad_to_display_width(build_elevator_indicators(elevators_on_floor), 20)
+      people_section = pad_to_display_width(build_people_indicators(people_count), 25)
 
       # Combine with exact spacing: floor(8) + " │ " + elevators(20) + " │ " + people(25) = 58 chars
-      "#{floor_label} │ #{elevator_section}│ #{people_section}"
+      "#{floor_label} │ #{elevator_section} │ #{people_section}"
     end
 
     def get_elevators_on_floor(floor, state)
@@ -131,16 +131,16 @@ module ElevatorSim
     def build_elevator_indicators(elevators)
       indicators = []
 
-      # Show up to 4 elevators per floor, each taking exactly 4 characters
+      # Show up to 4 elevators per floor, each taking exactly 4 display characters
       (1..4).each do |position|
         indicators << if (elevator = elevators[position - 1])
-          format_elevator_indicator(elevator).ljust(4)
+          pad_to_display_width(format_elevator_indicator(elevator), 4)
         else
           "    "  # Exactly 4 spaces
         end
       end
 
-      # Join with single spaces to get exactly 19 characters total
+      # Join with single spaces to get exactly 19 display characters total
       indicators.join(" ")
     end
 
@@ -156,12 +156,12 @@ module ElevatorSim
         @pastel.yellow("◉#{id}")
       when :idle
         if elevator.passengers.any?
-          @pastel.blue("═#{id}═")
+          @pastel.blue("⬜#{id}")
         else
-          @pastel.dim("│#{id}│")
+          @pastel.dim("⬜#{id}")
         end
       else
-        @pastel.magenta("?#{id}?")
+        @pastel.magenta("?#{id}")
       end
     end
 
@@ -281,6 +281,16 @@ module ElevatorSim
       else
         # Crude truncation, might break emojis
         string[0...(max_width - 3)] + "..."
+      end
+    end
+
+    def pad_to_display_width(string, target_width)
+      current_width = calculate_display_width(string)
+      if current_width >= target_width
+        string
+      else
+        padding_needed = target_width - current_width
+        string + (" " * padding_needed)
       end
     end
   end
