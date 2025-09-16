@@ -256,8 +256,8 @@ Statistics:
 ✅ Core simulation classes - Building, Elevator, User, Algorithm interface  
 ✅ Simulation engine with time-based orchestration and statistics  
 ✅ Working CLI simulation with comprehensive statistics output
-✅ Interactive step-by-step simulation mode
-✅ FIFO algorithm example implementation  
+✅ Interactive step-by-step simulation mode with `--interactive` flag
+✅ FIFO algorithm example implementation with comprehensive API documentation
 🔲 Real-time visualization with fancy terminal UI
 
 ## Understanding Statistics
