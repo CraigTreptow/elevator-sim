@@ -267,15 +267,38 @@ module ElevatorSim
     end
 
     def generate_statistics
+      total_users = @users.length + @completed_users.length
+      completion_rate = total_users > 0 ? (@completed_users.length.to_f / total_users * 100) : 0
+
       puts "\n📊 Simulation Statistics"
       puts "=" * 50
       puts "⏱️  Duration: #{@current_time.round(1)}s (#{(@current_time / 60.0).round(1)} minutes)"
-      puts "👥 Total Users: #{@users.length + @completed_users.length}"
-      puts "✅ Completed: #{@completed_users.length}"
+      puts "👥 Total Users: #{total_users}"
+      
+      # Show completion with rate and performance indicator
+      completion_line = "✅ Completed: #{@completed_users.length}/#{total_users} (#{completion_rate.round(1)}%)"
+      if completion_rate < 50
+        completion_line += " ⚠️  LOW COMPLETION RATE"
+      elsif completion_rate < 80
+        completion_line += " ⚡ MODERATE PERFORMANCE"
+      else
+        completion_line += " 🎯 GOOD PERFORMANCE"
+      end
+      puts completion_line
+
       puts "⏳ Average Wait Time: #{calculate_average_wait_time.round(2)}s"
       puts "🚗 Average Ride Time: #{calculate_average_ride_time.round(2)}s"
       puts "🕒 Average Total Time: #{calculate_average_total_time.round(2)}s"
       puts "📈 Elevator Utilization: #{(calculate_elevator_utilization * 100).round(1)}%"
+
+      # Add performance summary
+      if completion_rate < 30
+        puts "\n🚨 POOR PERFORMANCE: Most users didn't reach their destination"
+        puts "   Consider checking algorithm logic or increasing simulation duration"
+      elsif completion_rate < 60
+        puts "\n⚠️  SUBOPTIMAL PERFORMANCE: Many users didn't complete their journey"
+        puts "   Algorithm may need optimization for better efficiency"
+      end
     end
   end
 end
