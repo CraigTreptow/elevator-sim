@@ -90,7 +90,7 @@ module ElevatorSim
       building_content = building_lines.map { |line| " #{line} " }.join("\n")
 
       TTY::Box.frame(
-        width: [@screen.width - 4, 80].min,
+        width: 60,  # Fixed width based on content: floor(8) + separators + elevators(20) + people(25) + padding
         border: :light,
         title: {top_left: " Building View "},
         padding: 0
@@ -107,14 +107,12 @@ module ElevatorSim
       # Get people waiting on this floor
       people_count = count_people_waiting_on_floor(floor, state)
 
-      # Build elevator indicators with fixed width
-      elevator_section = build_elevator_indicators(elevators_on_floor)
+      # Build sections with exact fixed widths
+      elevator_section = build_elevator_indicators(elevators_on_floor).ljust(20)
+      people_section = build_people_indicators(people_count).ljust(25)
 
-      # Build people indicators with fixed width
-      people_section = build_people_indicators(people_count)
-
-      # Combine sections with consistent spacing
-      "#{floor_label} │ #{elevator_section} │ #{people_section}"
+      # Combine with exact spacing: floor(8) + " │ " + elevators(20) + " │ " + people(25) = 58 chars
+      "#{floor_label} │ #{elevator_section}│ #{people_section}"
     end
 
     def get_elevators_on_floor(floor, state)
@@ -136,15 +134,14 @@ module ElevatorSim
       # Show up to 4 elevators per floor, each taking exactly 4 characters
       (1..4).each do |position|
         indicators << if (elevator = elevators[position - 1])
-          format_elevator_indicator(elevator)
+          format_elevator_indicator(elevator).ljust(4)
         else
           "    "  # Exactly 4 spaces
         end
       end
 
-      # Join with single spaces, total width: 4*4 + 3*1 = 19 characters
-      result = indicators.join(" ")
-      result.ljust(19)  # Ensure exactly 19 characters
+      # Join with single spaces to get exactly 19 characters total
+      indicators.join(" ")
     end
 
     def format_elevator_indicator(elevator)
@@ -170,26 +167,12 @@ module ElevatorSim
 
     def build_people_indicators(count)
       if count == 0
-        " " * 40  # Fixed width for empty
-      else
+        ""  # Empty - will be padded by ljust
+      elsif count <= 5
         # Build the people string
-        people_str = if count <= 5
-          "👤" * count
-        else
-          "👤" * 5 + @pastel.dim("(#{count})")
-        end
-
-        # Simple padding to fixed width - emojis are 1 char in this terminal
-        # Remove ANSI codes for length calculation
-        clean_str = people_str.gsub(/\e\[[0-9;]*m/, "")
-        padding_needed = 40 - clean_str.length
-
-        if padding_needed > 0
-          people_str + (" " * padding_needed)
-        else
-          # Truncate if too long
-          people_str[0...37] + "..."
-        end
+        "👤" * count
+      else
+        "👤" * 5 + @pastel.dim("(#{count})")
       end
     end
 
