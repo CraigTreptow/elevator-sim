@@ -64,15 +64,11 @@ module ElevatorSim
       elapsed = sprintf("%.1f", state[:time] / 60.0)
 
       header = @pastel.cyan.bold("🏢 Elevator Simulation") +
-        @pastel.dim(" │ ") +
+        @pastel.dim(" | ") +
         @pastel.yellow("#{time_str} elapsed") +
         @pastel.dim(" (#{elapsed}min)")
 
-      TTY::Box.frame(
-        width: [@screen.width - 4, 60].min,
-        border: :light,
-        padding: 0
-      ) { " " + header + " " }
+      "─" * 60 + "\n" + header + "\n" + "─" * 60
     end
 
     def build_building_view(state)
@@ -86,15 +82,11 @@ module ElevatorSim
         building_lines << line
       end
 
-      # Frame the building with manual padding
-      building_content = building_lines.map { |line| " #{line} " }.join("\n")
-
-      TTY::Box.frame(
-        width: 60,
-        border: :light,
-        title: {top_left: " Building View "},
-        padding: 0
-      ) { building_content }
+      # Simple section with title and content
+      title = @pastel.bright_blue("Building View")
+      content = building_lines.join("\n")
+      
+      "#{title}\n" + "─" * 30 + "\n" + content
     end
     def build_floor_line(floor, state, floor_width)
       # Build floor label with fixed width (8 chars total)
@@ -175,10 +167,10 @@ module ElevatorSim
     def build_statistics_view(state)
       stats = state[:statistics]
 
+      title = @pastel.bright_blue("📊 Live Statistics")
+      
       lines = []
-      lines << @pastel.bright_blue("📊 Live Statistics")
-      lines << ""
-
+      
       # Users stats
       total = stats[:total_users]
       completed = stats[:completed_users]
@@ -199,14 +191,9 @@ module ElevatorSim
       call_count = state[:call_requests].length
       lines << format_simple_stat("📞 Active Calls", call_count.to_s)
 
-      stats_content = lines.join("\n")
-
-      TTY::Box.frame(
-        width: [@screen.width - 4, 60].min,
-        border: :light,
-        title: {top_left: " Statistics "},
-        padding: 0
-      ) { " " + stats_content.gsub("\n", "\n ") + " " }
+      content = lines.join("\n")
+      
+      "#{title}\n" + "─" * 30 + "\n" + content
     end
 
     def format_stat_line(label, value, percentage, unit)
