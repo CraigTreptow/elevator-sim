@@ -3,7 +3,6 @@
 require "tty-box"
 require "tty-cursor"
 require "tty-screen"
-require "tty-table"
 require "pastel"
 
 module ElevatorSim
@@ -78,36 +77,43 @@ module ElevatorSim
 
     def build_building_view(state)
       floors = @building.floor_range.to_a.reverse
-      
-      # Build table data
-      table_data = []
+      max_floor_width = floors.map(&:to_s).map(&:length).max
+
+      building_lines = []
+
       floors.each do |floor|
-        floor_label = @pastel.dim("Floor #{floor}")
-        elevators = build_elevator_indicators(get_elevators_on_floor(floor, state))
-        people = build_people_indicators(count_people_waiting_on_floor(floor, state))
-        
-        table_data << [floor_label, elevators, people]
+        line = build_floor_line(floor, state, max_floor_width)
+        building_lines << line
       end
-      
-      # Create table with proper alignment
-      table = TTY::Table.new(
-        header: [@pastel.dim("Floor"), @pastel.dim("Elevators"), @pastel.dim("People")],
-        rows: table_data
-      )
-      
-      # Render table with borders
-      table_content = table.render(:unicode, padding: [0, 1], width: 58) do |renderer|
-        renderer.border.separator = :each_row
-      end
-      
+
+      # Frame the building with manual padding
+      building_content = building_lines.map { |line| " #{line} " }.join("\n")
+
       TTY::Box.frame(
-        width: 62,
+        width: 60,
         border: :light,
         title: {top_left: " Building View "},
         padding: 0
-      ) { " #{table_content.gsub("\n", "\n ").chomp} " }
+      ) { building_content }
     end
+    def build_floor_line(floor, state, floor_width)
+      # Build floor label with fixed width (8 chars total)
+      floor_label = sprintf("Floor %#{floor_width}s", floor).ljust(8)
+      floor_label = @pastel.dim(floor_label)
 
+      # Get elevators on this floor
+      elevators_on_floor = get_elevators_on_floor(floor, state)
+
+      # Get people waiting on this floor
+      people_count = count_people_waiting_on_floor(floor, state)
+
+      # Build sections with fixed widths
+      elevator_section = build_elevator_indicators(elevators_on_floor).ljust(20)
+      people_section = build_people_indicators(people_count).ljust(25)
+
+      # Combine: floor(8) + " │ " + elevators(20) + " │ " + people(25) = 58 chars
+      "#{floor_label} │ #{elevator_section} │ #{people_section}"
+    end
 
     def get_elevators_on_floor(floor, state)
       state[:building].elevators.select do |elevator|
@@ -142,9 +148,9 @@ module ElevatorSim
         @pastel.yellow("◉#{id}")
       when :idle
         if elevator.passengers.any?
-          @pastel.blue("⬜#{id}")
+          @pastel.blue("█#{id}")
         else
-          @pastel.dim("⬜#{id}")
+          @pastel.dim("│#{id}")
         end
       else
         @pastel.magenta("?#{id}")
