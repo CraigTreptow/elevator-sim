@@ -127,6 +127,14 @@ module ElevatorSim
       value
     end
 
+    def extract_flag(args, flag_name)
+      index = args.find_index(flag_name)
+      return false unless index
+
+      args.delete_at(index)
+      true
+    end
+
     def list_queues_command(args)
       puts "📋 Available queues:"
 
@@ -226,7 +234,7 @@ module ElevatorSim
       config_file = extract_option(args, "--config") || "config/default.toml"
       algorithm_file = extract_option(args, "--algorithm") || "algorithms/fifo.rb"
       queue_name = extract_option(args, "--queue")
-      interactive = args.include?("--interactive")
+      interactive = extract_flag(args, "--interactive")
 
       puts "🎮 Interactive simulation..."
       puts "  Config: #{config_file}"
@@ -271,8 +279,8 @@ module ElevatorSim
             break if state[:time] >= config.duration_minutes * 60
 
             print "\nPress Enter for next step (or 'quit'): "
-            input = gets.chomp
-            break if input.downcase == "quit"
+            input = $stdin.gets
+            break if input.nil? || input.chomp.downcase == "quit"
           end
 
           puts "\n📊 Final Statistics:"
