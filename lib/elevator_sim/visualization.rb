@@ -3,6 +3,7 @@
 require "tty-box"
 require "tty-cursor"
 require "tty-screen"
+require "tty-table"
 require "pastel"
 
 module ElevatorSim
@@ -77,45 +78,36 @@ module ElevatorSim
 
     def build_building_view(state)
       floors = @building.floor_range.to_a.reverse
-      max_floor_width = floors.map(&:to_s).map(&:length).max
-
-      building_lines = []
-
+      
+      # Build table data
+      table_data = []
       floors.each do |floor|
-        line = build_floor_line(floor, state, max_floor_width)
-        building_lines << line
+        floor_label = @pastel.dim("Floor #{floor}")
+        elevators = build_elevator_indicators(get_elevators_on_floor(floor, state))
+        people = build_people_indicators(count_people_waiting_on_floor(floor, state))
+        
+        table_data << [floor_label, elevators, people]
       end
-
-      # Frame the building with manual padding
-      building_content = building_lines.map { |line| " #{line} " }.join("\n")
-
+      
+      # Create table with proper alignment
+      table = TTY::Table.new(
+        header: [@pastel.dim("Floor"), @pastel.dim("Elevators"), @pastel.dim("People")],
+        rows: table_data
+      )
+      
+      # Render table with borders
+      table_content = table.render(:unicode, padding: [0, 1], width: 58) do |renderer|
+        renderer.border.separator = :each_row
+      end
+      
       TTY::Box.frame(
-        width: 62,  # Adjusted width: floor(8) + separators(6) + elevators(20) + people(25) + padding(3) = 62
+        width: 62,
         border: :light,
         title: {top_left: " Building View "},
         padding: 0
-      ) { building_content }
+      ) { " #{table_content.gsub("\n", "\n ").chomp} " }
     end
 
-    def build_floor_line(floor, state, floor_width)
-      # Create floor label without color first, then apply color to the entire padded string
-      raw_floor_label = sprintf("Floor %#{floor_width}s", floor)
-      # Pad the raw label to exactly 8 characters, then apply color
-      floor_label = @pastel.dim(raw_floor_label.ljust(8))
-
-      # Get elevators on this floor
-      elevators_on_floor = get_elevators_on_floor(floor, state)
-
-      # Get people waiting on this floor
-      people_count = count_people_waiting_on_floor(floor, state)
-
-      # Build sections with exact fixed widths (calculate display width to handle colored text)
-      elevator_section = pad_to_display_width(build_elevator_indicators(elevators_on_floor), 20)
-      people_section = pad_to_display_width(build_people_indicators(people_count), 25)
-
-      # Combine with exact spacing: floor(8) + " │ " + elevators(20) + " │ " + people(25) = 58 chars
-      "#{floor_label} │ #{elevator_section} │ #{people_section}"
-    end
 
     def get_elevators_on_floor(floor, state)
       state[:building].elevators.select do |elevator|
@@ -131,19 +123,11 @@ module ElevatorSim
     end
 
     def build_elevator_indicators(elevators)
-      indicators = []
-
-      # Show up to 4 elevators per floor, each taking exactly 4 display characters
-      (1..4).each do |position|
-        indicators << if (elevator = elevators[position - 1])
-          pad_to_display_width(format_elevator_indicator(elevator), 4)
-        else
-          "    "  # Exactly 4 spaces
-        end
+      if elevators.empty?
+        ""
+      else
+        elevators.map { |elevator| format_elevator_indicator(elevator) }.join(" ")
       end
-
-      # Join with single spaces to get exactly 19 display characters total
-      indicators.join(" ")
     end
 
     def format_elevator_indicator(elevator)
@@ -286,14 +270,5 @@ module ElevatorSim
       end
     end
 
-    def pad_to_display_width(string, target_width)
-      current_width = calculate_display_width(string)
-      if current_width >= target_width
-        string
-      else
-        padding_needed = target_width - current_width
-        string + (" " * padding_needed)
-      end
-    end
   end
 end
