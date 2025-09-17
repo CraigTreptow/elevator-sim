@@ -90,3 +90,38 @@ button_press_delay = 0.5
 - **Interactive step control** for pause/resume simulation
 - **Color coding** for different elevator states and performance metrics
 - **Simplified layout** eliminates vertical border alignment issues
+
+## Future Feature Ideas
+### Algorithm Comparison Mode
+- **New CLI command**: `./bin/elevator-sim compare --algorithms algorithms/fifo.rb,algorithms/nearest.rb --queue rush_hour`
+- **Side-by-side performance metrics** showing wait times, utilization, efficiency across multiple algorithms
+- **Statistical significance testing** to determine which algorithm performs better
+- **Export comparison reports** to CSV/JSON for external analysis
+
+### User Behavior Modeling
+- **User type configuration** in TOML:
+  ```toml
+  [users.business]
+  percentage = 60
+  rush_hour_multiplier = 3.0
+  patience_level = 0.8
+  
+  [users.elderly] 
+  percentage = 20
+  movement_speed = 0.5
+  door_hold_time = 2.0
+  
+  [users.tourist]
+  percentage = 20
+  random_floor_selection = 0.3
+  group_travel_probability = 0.4
+  ```
+- **Behavioral differences**: impatient users, elderly with slower movement, tourists with random destinations
+- **Group behavior**: families/colleagues traveling together
+
+### Enhanced Analytics
+- **Confidence intervals** for all performance metrics
+- **Performance degradation detection** - automatic flagging of poor algorithm performance
+- **Traffic pattern analysis** - identify and categorize peak usage periods
+- **Real-time performance profiling** - bottleneck identification in custom algorithms
+- **Machine learning integration** - train algorithms on historical building usage patterns
